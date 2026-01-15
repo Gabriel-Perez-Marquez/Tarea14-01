@@ -1,6 +1,7 @@
 package com.salesianostriana.dam.ClinicFlow.service;
 
 import com.salesianostriana.dam.ClinicFlow.dto.CitaDetailDto;
+import com.salesianostriana.dam.ClinicFlow.dto.CitaListDto;
 import com.salesianostriana.dam.ClinicFlow.dto.CreateCitaRequest;
 import com.salesianostriana.dam.ClinicFlow.model.*;
 import com.salesianostriana.dam.ClinicFlow.repository.CitaRepository;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,15 +43,20 @@ public class CitaService {
         }
     }
 
-    public CitaDetailDto cancelarCita (Long idCita){
+    public Cita cancelarCita (Long idCita){
         Cita cita = citaRepository.findById(idCita).orElseThrow(() -> new RuntimeException("Cita no encontrada"));
 
         if(cita.getEstado()!=Estado.ATENDIDA){
             cita.setEstado(Estado.CANCELADA);
-            return CitaDetailDto.of(citaRepository.save(cita));
+            return citaRepository.save(cita);
         } else{
             throw new RuntimeException("No se puede cancelar una cita que ya ha sido atendida");
         }
+    }
+
+    public List<Cita> mostrarCitaPaciente (Long idPaciente) {
+        Paciente p = pacienteRepository.findById(idPaciente).orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+        return citaRepository.findCitaByPaciente(p);
     }
 
 
